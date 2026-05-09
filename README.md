@@ -1,6 +1,6 @@
-# HealthCare Backend Documentation
+# HealthCare Backend
 
-This directory contains the split project documentation for the HealthCare backend. The original monolithic requirements document has been reorganized into focused sections so teams can work by domain without editing a single large file.
+HealthCare is a comprehensive healthcare management system backend built with modern web technologies, designed to facilitate seamless interaction between healthcare providers (doctors) and patients through a robust, secure, and scalable API infrastructure.
 
 ## Documentation Map
 
