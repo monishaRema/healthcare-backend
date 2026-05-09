@@ -1,6 +1,6 @@
-# PH-HealthCare Backend Documentation
+# HealthCare Backend Documentation
 
-This directory contains the split project documentation for the PH-HealthCare backend. The original monolithic requirements document has been reorganized into focused sections so teams can work by domain without editing a single large file.
+This directory contains the split project documentation for the HealthCare backend. The original monolithic requirements document has been reorganized into focused sections so teams can work by domain without editing a single large file.
 
 ## Documentation Map
 

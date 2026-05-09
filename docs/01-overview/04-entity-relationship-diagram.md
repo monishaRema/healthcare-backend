@@ -6,7 +6,7 @@
 
 ## Diagram
 
-![PH-HealthCare ERD](../05-assets/ERD.svg)
+![HealthCare ERD](../05-assets/ERD.svg)
 
 ## Notes
 

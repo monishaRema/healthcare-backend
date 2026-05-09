@@ -6,7 +6,7 @@
 ### 8.2 Project Structure
 
 ```text
-Backend-My-PH-HealthCare/
+Backend-My-HealthCare/
 ├── src/
 │ ├── app.ts # Express app setup
 │ ├── server.ts # Server entry point

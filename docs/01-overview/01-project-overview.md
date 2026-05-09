@@ -6,7 +6,7 @@
 
 ## 1. Project Overview
 
-PH-HealthCare is a comprehensive healthcare management system backend built with modern web technologies, designed to facilitate seamless interaction between healthcare providers (doctors) and patients through a robust, secure, and scalable API infrastructure.
+HealthCare is a comprehensive healthcare management system backend built with modern web technologies, designed to facilitate seamless interaction between healthcare providers (doctors) and patients through a robust, secure, and scalable API infrastructure.
 
 ### 1.1 Business Context
 

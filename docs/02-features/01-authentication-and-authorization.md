@@ -56,7 +56,7 @@
 
 ###### Email Template Requirements
 
-- Subject: “Verify Your PH-HealthCare Account”
+- Subject: “Verify Your HealthCare Account”
 - Contains verification link with token
 - Professional HTML template
 - Mobile-responsive design
@@ -120,7 +120,7 @@
 
 ###### Reset Email Template Requirements
 
-- Subject: “Reset Your PH-HealthCare Password”
+- Subject: “Reset Your HealthCare Password”
 - Contains reset link with token
 - Link expires in 1 hour (clear message)
 - Warning about not sharing link
