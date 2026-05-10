@@ -9,6 +9,7 @@
     "dev": "tsx watch src/server.ts",
     "lint": "eslint ./src/**/*",
     "migrate": "prisma migrate dev",
+    "reset": "prisma reset",
     "generate": "prisma generate",
     "studio": "prisma studio",
     "push": "prisma db push",
@@ -17,7 +18,7 @@
   "keywords": [],
   "author": "Monisha Rema",
   "license": "ISC",
-   "packageManager": "pnpm@10.31.0",
+  "packageManager": "pnpm@10.31.0",
   "type": "module",
   "dependencies": {
     "@prisma/adapter-pg": "^7.3.0",
