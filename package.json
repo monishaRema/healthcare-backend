@@ -9,7 +9,7 @@
     "dev": "tsx watch src/server.ts",
     "lint": "eslint ./src/**/*",
     "migrate": "prisma migrate dev",
-    "reset": "prisma reset",
+    "reset": "prisma migrate reset",
     "generate": "prisma generate",
     "studio": "prisma studio",
     "push": "prisma db push",
