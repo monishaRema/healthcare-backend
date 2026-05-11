@@ -1,14 +1,14 @@
 import app from "./app";
+import { env } from "./app/config/env";
 
-const bootstrap = () =>{
-    try {
-        app.listen(5000,() =>{
-            console.log("Server is running on port 5000")
-        })
-        
-    } catch (error) {
-        console.error("Server failed: ", error)
-    }
-}
+const bootstrap = () => {
+  try {
+    app.listen(env.PORT, () => {
+      console.log(`Server is running on port ${env.PORT}`);
+    });
+  } catch (error) {
+    console.error("Server failed: ", error);
+  }
+};
 
 bootstrap();
