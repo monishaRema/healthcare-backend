@@ -2,53 +2,55 @@ import { UserStatus } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import { auth } from "../../lib/auth";
 import { ILoginUserPayload, IRegisterUserPayload } from "./auth.types";
+import { AuthRepository } from "./auth.repository";
 
 export const AuthService = {
   registerPatient: async function (payload: IRegisterUserPayload) {
-    const { name, email, password, contactNumber, address, profilePhoto } =
-      payload;
+    const { name, email, password } = payload;
 
     const result = await auth.api.signUpEmail({
       body: {
         name,
         email,
         password,
-        //default values
-        // needsPasswordChange: false,
-        // role: Role.PATIENT
       },
     });
     if (!result.user) {
       throw new Error("User creation failed");
     }
 
-    await prisma.patient.upsert({
-      where: {
-        userId: result.user.id,
-      },
-      update: {
-        name,
-        email,
-        profilePhoto: profilePhoto ?? result.user.image ?? null,
-        contactNumber: contactNumber ?? "PENDING",
-        address: address ?? null,
-      },
-      create: {
-        name,
-        email,
-        profilePhoto: profilePhoto ?? result.user.image ?? null,
-        contactNumber: contactNumber ?? "PENDING",
-        address: address ?? null,
-        userId: result.user.id,
-      },
-    });
+    try {
+      const patient = await prisma.$transaction(async (prismaTx) => {
+        const patient = await AuthRepository.createPatient(
+          {
+            name: result.user.name,
+            email: result.user.email,
+            userId: result.user.id,
+          },
+          prismaTx,
+          
+        );
+        return patient;
+      });
 
-    return result;
+      return {
+        ...result,
+        patient,
+      };
+    } catch (error) {
+      console.error("Transaction failed:", error);
+      await prisma.user.delete({
+        where: {
+          id: result.user.id,
+        },
+      });
+
+      throw new Error("Transaction failed: " + error);
+    }
   },
 
   loginUser: async function (payload: ILoginUserPayload) {
-
-    const {email,password} = payload
+    const { email, password } = payload;
     const data = await auth.api.signInEmail({
       body: {
         email,
@@ -62,6 +64,6 @@ export const AuthService = {
       throw new Error("User is deleted");
     }
 
-    return data
+    return data;
   },
 };

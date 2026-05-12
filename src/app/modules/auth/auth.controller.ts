@@ -9,7 +9,6 @@ export const AuthController = {
     registerPatient :catchAsync(async (req:Request,res:Response) => {
 
         const result = await AuthService.registerPatient(req.body)
-
         sendResponse({
             res,
             statusCode:status.CREATED,
