@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { catchAsync } from "../../shared/catchAsync";
 import { AuthService } from "./auth.service";
 import { sendResponse } from "../../shared/sendResponse";
+import status from "http-status";
 
 export const AuthController = {
 
@@ -11,10 +12,10 @@ export const AuthController = {
 
         sendResponse({
             res,
-            statusCode:201,
+            statusCode:status.CREATED,
             success:true,
             message:"User Created Successfully",
-            data:result
+           data:result
         })
     }),
     loginUser :catchAsync(async (req:Request,res:Response) => {
@@ -25,8 +26,8 @@ export const AuthController = {
             res,
             statusCode:200,
             success:true,
-            message:"User Logged in Successfully",
-            data:result
+            message:"User Login Successfully",
+           data:result
         })
     })
 }
