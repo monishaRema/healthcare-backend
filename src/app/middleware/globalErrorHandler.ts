@@ -1,6 +1,7 @@
 import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
 import { env } from "../config/env";
 import status from "http-status";
+import AppError from "../errorHelper/AppError";
 
 export const globalErrorHandler: ErrorRequestHandler = (
   err: unknown,
@@ -13,11 +14,18 @@ export const globalErrorHandler: ErrorRequestHandler = (
     console.log(err);
   }
 
-  const statusCode =
+  let statusCode =
     err instanceof Error && "statusCode" in err && typeof err.statusCode === "number"
       ? err.statusCode
       : status.INTERNAL_SERVER_ERROR;
-  const message = err instanceof Error ? err.message : "Internal Server Error";
+  let message = err instanceof Error ? err.message : "Internal Server Error";
+
+
+  if(err instanceof AppError) {
+    statusCode = err.statusCode;
+    message = err.message;
+  }
+
 
   void req;
   void next;

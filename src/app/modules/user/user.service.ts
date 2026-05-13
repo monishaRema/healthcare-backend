@@ -1,25 +1,32 @@
+import status from "http-status";
 import { Specialty, UserRole } from "../../../generated/prisma/client";
+import AppError from "../../errorHelper/AppError";
 import { auth } from "../../lib/auth";
 import { prisma } from "../../lib/prisma";
 import { ICreateDoctorPayload } from "./user.types";
 
 export const UserService = {
   createUser: async (payload: ICreateDoctorPayload) => {
-    const specialties: Specialty[] = [];
+    const specialtyIds = [...new Set(payload.specialties)];
 
-    for (const specialtyId of payload.specialties) {
-      const specialty = await prisma.specialty.findUnique({
-        where: {
-          id: specialtyId,
+    const specialties: Specialty[] = await prisma.specialty.findMany({
+      where: {
+        id: {
+          in: specialtyIds,
         },
-      });
+        isDeleted: false,
+      },
+    });
 
-      if (!specialty) {
-        throw new Error(`Specialty with id ${specialtyId} not found`);
-      }
-      if (specialty) {
-        specialties.push(specialty);
-      }
+    if (specialties.length !== specialtyIds.length) {
+      const foundIds = new Set(specialties.map((specialty) => specialty.id));
+
+      const missingIds = specialtyIds.filter((id) => !foundIds.has(id));
+
+      throw new AppError(
+        status.NOT_FOUND,
+        `Specialty not found or deleted: ${missingIds.join(", ")}`,
+      );
     }
 
     const userExists = await prisma.user.findUnique({
@@ -28,7 +35,24 @@ export const UserService = {
       },
     });
     if (userExists) {
-      throw new Error(`User with email ${payload.doctor.email} already exists`);
+      throw new AppError(
+        status.CONFLICT,
+        `User with email ${payload.doctor.email} already exists`
+      );
+    }
+
+    
+    const doctorExist = await prisma.doctor.findUnique({
+      where: {
+        registrationNumber: payload.doctor.registrationNumber,
+      },
+    });
+
+    if (doctorExist) {
+      throw new AppError(
+        status.CONFLICT,
+        "Doctor profile already exists for this registration number"
+      );
     }
 
     const userData = await auth.api.signUpEmail({
@@ -41,7 +65,14 @@ export const UserService = {
       },
     });
 
-    
+    if (!userData || !userData.user) {
+      throw new AppError(
+        status.INTERNAL_SERVER_ERROR,
+        "Failed to create user"
+      );
+    }
+
+
     try {
       const result = await prisma.$transaction(async (tx) => {
         const doctorData = await tx.doctor.create({
@@ -122,7 +153,10 @@ export const UserService = {
           id: userData.user.id,
         },
       });
-      throw error;
+      throw new AppError(
+        status.INTERNAL_SERVER_ERROR,
+        "Failed to create doctor profile"
+      );
     }
   },
 };

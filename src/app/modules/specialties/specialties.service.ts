@@ -1,6 +1,7 @@
 import { Prisma, Specialty } from "../../../generated/prisma/client";
 import status from "http-status";
 import { specialtiesRepo } from "./specialties.repository";
+import AppError from "../../errorHelper/AppError";
 
 export const specialtiesService = {
 
@@ -12,10 +13,10 @@ export const specialtiesService = {
     const existingSpecialty = await specialtiesRepo.getSpecialtyByTitle(payload.title);
 
     if (existingSpecialty) {
-      throw Object.assign(
-        new Error(`Specialty with title ${payload.title} already exists`),
-        { statusCode: status.CONFLICT },
-      );
+    throw new AppError(
+      status.CONFLICT,
+      `Specialty with title ${payload.title} already exists`,
+    );
     }
 
     return await specialtiesRepo.createSpecialty(payload);
@@ -41,9 +42,9 @@ export const specialtiesService = {
             await specialtiesRepo.getSpecialtyByTitle(updatedTitle);
 
           if (existingSpecialty && existingSpecialty.id !== id) {
-            throw Object.assign(
-              new Error(`Specialty with title ${updatedTitle} already exists`),
-              { statusCode: status.CONFLICT },
+            throw new AppError(
+              status.CONFLICT,
+              `Specialty with title ${updatedTitle} already exists`
             );
           }
         }

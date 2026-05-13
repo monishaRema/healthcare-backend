@@ -3,6 +3,8 @@ import { prisma } from "../../lib/prisma";
 import { auth } from "../../lib/auth";
 import { ILoginUserPayload, IRegisterUserPayload } from "./auth.types";
 import { AuthRepository } from "./auth.repository";
+import AppError from "../../errorHelper/AppError";
+import status from "http-status";
 
 export const AuthService = {
   registerPatient: async function (payload: IRegisterUserPayload) {
@@ -16,7 +18,10 @@ export const AuthService = {
       },
     });
     if (!result.user) {
-      throw new Error("User creation failed");
+      throw new AppError(
+        status.INTERNAL_SERVER_ERROR,
+        "Failed to create user"
+      );
     }
 
     try {
@@ -45,7 +50,10 @@ export const AuthService = {
         },
       });
 
-      throw new Error("Transaction failed: " + error);
+    throw new AppError(
+      status.INTERNAL_SERVER_ERROR,
+      "Failed to create patient profile"
+    );
     }
   },
 
@@ -58,10 +66,16 @@ export const AuthService = {
       },
     });
     if (data.user.status === UserStatus.BLOCKED) {
-      throw new Error("User is blocked");
+      throw new AppError(
+        status.FORBIDDEN,
+        "User is blocked"
+      );
     }
     if (data.user.isDeleted || data.user.status === UserStatus.DELETED) {
-      throw new Error("User is deleted");
+      throw new AppError(
+        status.NOT_FOUND,
+        "User is deleted"
+      );
     }
 
     return data;
