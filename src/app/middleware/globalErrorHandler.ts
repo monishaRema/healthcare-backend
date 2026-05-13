@@ -13,7 +13,10 @@ export const globalErrorHandler: ErrorRequestHandler = (
     console.log(err);
   }
 
-  let statusCode = status.INTERNAL_SERVER_ERROR;
+  const statusCode =
+    err instanceof Error && "statusCode" in err && typeof err.statusCode === "number"
+      ? err.statusCode
+      : status.INTERNAL_SERVER_ERROR;
   const message = err instanceof Error ? err.message : "Internal Server Error";
 
   void req;
@@ -21,7 +24,10 @@ export const globalErrorHandler: ErrorRequestHandler = (
 
   res.status(statusCode).json({
     success: false,
-    message: "Internal Server error",
+    message:
+      statusCode === status.INTERNAL_SERVER_ERROR
+        ? "Internal Server error"
+        : message,
     error: message,
   });
 };

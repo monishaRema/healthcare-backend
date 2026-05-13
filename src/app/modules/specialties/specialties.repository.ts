@@ -2,9 +2,19 @@ import { Prisma, Specialty } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
 
 export const specialtiesRepo = {
-  createSpecialty: async function (payload: Specialty): Promise<Specialty> {
+  createSpecialty: async function (
+    payload: Prisma.SpecialtyCreateInput,
+  ): Promise<Specialty> {
     return await prisma.specialty.create({
       data: payload,
+    });
+  },
+
+  getSpecialtyByTitle: async function (title: string): Promise<Specialty | null> {
+    return await prisma.specialty.findUnique({
+      where: {
+        title,
+      },
     });
   },
 
