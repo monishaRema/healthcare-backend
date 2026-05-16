@@ -38,6 +38,8 @@ export function checkAuth(...roles: UserRole[]) {
         }
         if (verifiedSession && verifiedSession.user) {
           const user = verifiedSession.user;
+
+          // Check if session is close to expiring (e.g., less than 20% remaining)
           const now = new Date();
           const expiresAt = new Date(verifiedSession.expiresAt);
           const createdAt = new Date(verifiedSession.createdAt);
@@ -57,6 +59,7 @@ export function checkAuth(...roles: UserRole[]) {
             );
           }
 
+          // Check user status and role
           if (
             user.status === UserStatus.BLOCKED ||
             user.status === UserStatus.DELETED

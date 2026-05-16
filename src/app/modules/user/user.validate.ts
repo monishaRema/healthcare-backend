@@ -1,14 +1,14 @@
 import z from "zod";
 import { Gender } from "../../../generated/prisma/enums";
 
-export const createDoctorZodSchema = z.object({
+const createDoctorZodSchema = z.object({
     password: z.string("Password is required").min(6, "Password must be at least 6 characters").max(20, "Password must be at most 20 characters"),
     doctor: z.object({
         name: z.string("Name is required and must be string").min(5, "Name must be at least 5 characters").max(30, "Name must be at most 30 characters"),
 
         email: z.email("Invalid email address"),
 
-        contactNumber: z.string("Contact number is required").min(11, "Contact number must be at least 11 characters").max(14, "Contact number must be at most 15 characters"),
+        contactNumber: z.string("Contact number is required").min(8, "Contact number must be at least 8 characters").max(14, "Contact number must be at most 14 characters"),
 
         address: z.string("Address is required").min(10, "Address must be at least 10 characters").max(100, "Address must be at most 100 characters").optional(),
 
@@ -29,3 +29,26 @@ export const createDoctorZodSchema = z.object({
     }),
     specialties: z.array(z.uuid(), "Specialties must be an array of strings").min(1, "At least one specialty is required")
 })
+
+const createAdminValidationSchema = z.object({
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  admin: z.object({
+    name: z.string().min(1, "Name is required"),
+    email: z.email("Invalid email format"),
+    profilePhoto: z.url("Invalid URL format").optional(),
+    contactNumber: z.string().min(1, "Contact number is required"),
+  }),
+});
+
+
+
+
+export const userValidation = {
+    createDoctorZodSchema,
+    createAdminValidationSchema,
+}
+
+export type UserValidationType = {
+    createDoctorZodSchema: z.infer<typeof createDoctorZodSchema>,
+    createAdminValidationSchema: z.infer<typeof createAdminValidationSchema>,
+}

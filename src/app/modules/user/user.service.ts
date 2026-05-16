@@ -4,9 +4,11 @@ import AppError from "../../errorHelper/AppError";
 import { auth } from "../../lib/auth";
 import { prisma } from "../../lib/prisma";
 import { ICreateDoctorPayload } from "./user.types";
+import { UserValidationType } from "./user.validate";
+import { UserRepository } from "./user.repository";
 
 export const UserService = {
-  createUser: async (payload: ICreateDoctorPayload) => {
+  createDoctor: async (payload: ICreateDoctorPayload) => {
     const specialtyIds = [...new Set(payload.specialties)];
 
     const specialties: Specialty[] = await prisma.specialty.findMany({
@@ -29,29 +31,24 @@ export const UserService = {
       );
     }
 
-    const userExists = await prisma.user.findUnique({
-      where: {
-        email: payload.doctor.email,
-      },
-    });
+    const userExists = await UserRepository.findUserByEmail(
+      payload.doctor.email,
+    );
     if (userExists) {
       throw new AppError(
         status.CONFLICT,
-        `User with email ${payload.doctor.email} already exists`
+        `User with email ${payload.doctor.email} already exists`,
       );
     }
 
-    
-    const doctorExist = await prisma.doctor.findUnique({
-      where: {
-        registrationNumber: payload.doctor.registrationNumber,
-      },
-    });
+    const doctorExist = await UserRepository.findDoctorByRegistrationNumber(
+      payload.doctor.registrationNumber,
+    );
 
     if (doctorExist) {
       throw new AppError(
         status.CONFLICT,
-        "Doctor profile already exists for this registration number"
+        "Doctor profile already exists for this registration number",
       );
     }
 
@@ -66,12 +63,8 @@ export const UserService = {
     });
 
     if (!userData || !userData.user) {
-      throw new AppError(
-        status.INTERNAL_SERVER_ERROR,
-        "Failed to create user"
-      );
+      throw new AppError(status.INTERNAL_SERVER_ERROR, "Failed to create user");
     }
-
 
     try {
       const result = await prisma.$transaction(async (tx) => {
@@ -148,14 +141,64 @@ export const UserService = {
       return result;
     } catch (error) {
       console.log("Transaction error : ", error);
-      await prisma.user.delete({
-        where: {
-          id: userData.user.id,
-        },
-      });
+      await UserRepository.deleteUserById(userData.user.id);
       throw new AppError(
         status.INTERNAL_SERVER_ERROR,
-        "Failed to create doctor profile"
+        "Failed to create doctor profile",
+      );
+    }
+  },
+
+  createAdmin: async (
+    payload: UserValidationType["createAdminValidationSchema"],
+  ) => {
+    const userExists = await UserRepository.findUserByEmail(
+      payload.admin.email,
+    );
+    if (userExists) {
+      throw new AppError(
+        status.CONFLICT,
+        `User with email ${payload.admin.email} already exists`,
+      );
+    }
+
+    const { admin, password } = payload;
+
+    const userData = await auth.api.signUpEmail({
+      body: {
+        ...admin,
+        password,
+        role: UserRole.ADMIN,
+        needPasswordChange: true,
+      },
+    });
+
+    if (!userData || !userData.user) {
+      throw new AppError(status.INTERNAL_SERVER_ERROR, "Failed to create user");
+    }
+
+    try {
+      const result = await prisma.$transaction(async (tx) => {
+        // create admin profile
+        const newAdmin = await UserRepository.createAdmin({
+          userId: userData.user.id,
+          ...admin,
+        }, tx);
+
+        // fetch the created admin profile with user data
+        const adminData = await UserRepository.findAdminById(newAdmin.id, tx);
+
+        return adminData;
+      });
+
+      return result;
+    } catch (error) {
+      console.log("Error creating admin profile : ", error);
+
+      await UserRepository.deleteUserById(userData.user.id);
+      throw new AppError(
+        status.INTERNAL_SERVER_ERROR,
+        "Failed to create admin profile",
       );
     }
   },

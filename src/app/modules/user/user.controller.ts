@@ -5,15 +5,27 @@ import { UserService } from "./user.service";
 import status from "http-status";
 
 export const UserController = {
-  createUser: catchAsync(async (req: Request, res: Response) => {
-    const result = await UserService.createUser(req.body);
+  createDoctor: catchAsync(async (req: Request, res: Response) => {
+    const result = await UserService.createDoctor(req.body);
 
     sendResponse({
       res,
       statusCode: status.CREATED,
       success: true,
-      message: "User created successfully",
+      message: "Doctor created successfully",
       data: result,
     });
   }),
+
+  createAdmin: catchAsync(async (req: Request, res: Response) => {
+    const result = await UserService.createAdmin(req.body);
+    sendResponse({
+      res,
+      statusCode: status.CREATED,
+      success: true,
+      message: "Admin created successfully",
+      data: result,
+    });
+  }),
+
 };
