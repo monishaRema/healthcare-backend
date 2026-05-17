@@ -1,31 +1,31 @@
-import { prisma } from "../../lib/prisma";
+
+import status from "http-status";
+import AppError from "../../errorHelper/AppError";
+import { DoctorsRepository } from "./doctor.repository";
 
 export const DoctorsService = {
   getAllDoctors: async () => {
-    const doctors = await prisma.doctor.findMany({
-      where: {
-        isDeleted: false,
-      },
-      include: {
-        user: true,
-        specialties: {
-          include: {
-            specialty: true,
-          },
-        },
-      },
-    });
+   const result = await DoctorsRepository.getAllDoctors();
+    // Transform specialties (flatten structure)
+  const doctors = result.map((doctor) => ({
+    ...doctor,
+    specialties: doctor.specialties.map((s) => s.specialty),
+  }));
 
-    return doctors;
+  return doctors;
+  
   },
 
   getDoctorById: async (id: string) => {
-    const doctor = await prisma.doctor.findFirst({
-      where: {
-        id,
-      },
-    });
-    return doctor;
+    const doctor = await DoctorsRepository.getDoctorById(id);
+    if(!doctor) {
+      throw new AppError(status.NOT_FOUND, "Doctor not found");
+    }
+
+    return {
+    ...doctor,
+    specialties: doctor.specialties.map((s) => s.specialty),
+  };
   },
 
   updateDoctor: async () => {},
