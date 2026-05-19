@@ -13,4 +13,6 @@ AuthRouter.get("/me", checkAuth(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIEN
 AuthRouter.post("/refresh-token", AuthController.getNewToken)
 AuthRouter.post("/change-password", checkAuth(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT, UserRole.SUPER_ADMIN), AuthController.changePassword)
 AuthRouter.post("/logout", checkAuth(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT, UserRole.SUPER_ADMIN), AuthController.logoutUser)
-// AuthRouter.post("/change-password/:id", checkAuth(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT, UserRole.SUPER_ADMIN), AuthController.changePassword)
+AuthRouter.post("/verify-email", AuthController.verifyEmail)
+
+

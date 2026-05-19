@@ -39,7 +39,7 @@ export const AuthRepository = {
 
     return prismaTx.patient.create({ data });
   },
-  
+
   getMe: async function (userId: string) {
     return prisma.user.findUnique({
       where: {
@@ -48,7 +48,6 @@ export const AuthRepository = {
       },
       include: userProfileInclude,
     });
-    
   },
   getNewToken: async function (sessionToken: string) {
     return prisma.session.findUnique({

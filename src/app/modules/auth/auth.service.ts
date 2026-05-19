@@ -1,7 +1,11 @@
-import {  UserStatus } from "../../../generated/prisma/enums";
+import { UserStatus } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import { auth } from "../../lib/auth";
-import { IChangePasswordPayload, ILoginUserPayload,  IRegisterUserPayload } from "./auth.types";
+import {
+  IChangePasswordPayload,
+  ILoginUserPayload,
+  IRegisterUserPayload,
+} from "./auth.types";
 import { AuthRepository } from "./auth.repository";
 import AppError from "../../errorHelper/AppError";
 import status from "http-status";
@@ -10,9 +14,6 @@ import { IRequestUser } from "../../interfaces/reqUser.interface";
 import { jwtUtils } from "../../utils/jwt";
 import { env } from "../../config/env";
 import { JwtPayload } from "jsonwebtoken";
-
-
-
 
 export const AuthService = {
   registerPatient: async function (payload: IRegisterUserPayload) {
@@ -95,8 +96,6 @@ export const AuthService = {
       emailVerified: data.user.emailVerified,
     });
 
-   
-
     return {
       ...data,
       accessToken,
@@ -104,11 +103,11 @@ export const AuthService = {
     };
   },
 
-  getMe: async function (user:IRequestUser) {
+  getMe: async function (user: IRequestUser) {
     const isUserExists = await AuthRepository.getMe(user.userId);
 
-     if (!isUserExists) {
-         throw new AppError(status.NOT_FOUND, "User not found");
+    if (!isUserExists) {
+      throw new AppError(status.NOT_FOUND, "User not found");
     }
     return isUserExists;
   },
@@ -220,13 +219,22 @@ export const AuthService = {
     };
   },
 
-  logoutUser: async (sessionToken : string) => {
+  logoutUser: async (sessionToken: string) => {
     const result = await auth.api.signOut({
-        headers : new Headers({
-            Authorization : `Bearer ${sessionToken}`
-        })
-    })
+      headers: new Headers({
+        Authorization: `Bearer ${sessionToken}`,
+      }),
+    });
 
     return result;
-}
+  },
+
+  verifyEmail: async (email: string, otp: string) => {
+    return await auth.api.verifyEmailOTP({
+      body: {
+        email,
+        otp,
+      },
+    });
+  },
 };

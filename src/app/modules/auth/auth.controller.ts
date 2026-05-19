@@ -140,4 +140,16 @@ export const AuthController = {
       data: result,
     });
   }),
+
+  verifyEmail: catchAsync(async (req: Request, res: Response) => {
+    const { email, otp } = req.body;
+
+    await AuthService.verifyEmail(email, otp);
+    sendResponse({
+      res,
+      statusCode: status.OK,
+      success: true,
+      message: "Email verified successfully",
+    });
+  }),
 };
