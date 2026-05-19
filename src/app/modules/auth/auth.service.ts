@@ -1,11 +1,15 @@
 import {  UserStatus } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import { auth } from "../../lib/auth";
-import { ILoginUserPayload, IRegisterUserPayload } from "./auth.types";
+import { ILoginUserPayload, IRegisterPatientPayload, IRegisterUserPayload } from "./auth.types";
 import { AuthRepository } from "./auth.repository";
 import AppError from "../../errorHelper/AppError";
 import status from "http-status";
 import { tokenUtils } from "../../utils/token";
+import { IRequestUser } from "../../interfaces/reqUser.interface";
+import { jwtUtils } from "../../utils/jwt";
+import { env } from "../../config/env";
+import { JwtPayload } from "jsonwebtoken";
 
 
 
@@ -97,6 +101,61 @@ export const AuthService = {
       ...data,
       accessToken,
       refreshToken,
+    };
+  },
+
+  getMe: async function (user:IRequestUser) {
+    const isUserExists = await AuthRepository.getMe(user.userId);
+
+     if (!isUserExists) {
+         throw new AppError(status.NOT_FOUND, "User not found");
+    }
+    return isUserExists;
+  },
+  getNewToken: async function (refreshToken: string, sessionToken: string) {
+    const isSessionTokenExists = await AuthRepository.getNewToken(sessionToken);
+
+    if (!isSessionTokenExists) {
+      throw new AppError(status.UNAUTHORIZED, "Invalid session token");
+    }
+
+    const verifiedRefreshToken = jwtUtils.verifyToken(
+      refreshToken,
+      env.REFRESH_TOKEN_SECRET,
+    );
+
+    if (!verifiedRefreshToken.success && verifiedRefreshToken.error) {
+      throw new AppError(status.UNAUTHORIZED, "Invalid refresh token");
+    }
+
+    const data = verifiedRefreshToken.decoded as JwtPayload;
+
+    const newAccessToken = tokenUtils.getAccessToken({
+      userId: data.userId,
+      role: data.role,
+      name: data.name,
+      email: data.email,
+      status: data.status,
+      isDeleted: data.isDeleted,
+      emailVerified: data.emailVerified,
+    });
+
+    const newRefreshToken = tokenUtils.getRefreshToken({
+      userId: data.userId,
+      role: data.role,
+      name: data.name,
+      email: data.email,
+      status: data.status,
+      isDeleted: data.isDeleted,
+      emailVerified: data.emailVerified,
+    });
+
+    const session = await AuthRepository.updateSessionExpiry(sessionToken);
+
+    return {
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
+      sessionToken: session.token,
     };
   },
 };
