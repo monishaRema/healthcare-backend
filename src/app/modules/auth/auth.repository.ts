@@ -74,4 +74,14 @@ export const AuthRepository = {
       },
     });
   },
+  updatePassword: async function (userId: string) {
+    return prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        needPasswordChange: false,
+      },
+    });
+  },
 };

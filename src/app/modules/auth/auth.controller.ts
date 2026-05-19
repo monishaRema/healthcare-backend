@@ -5,6 +5,7 @@ import { sendResponse } from "../../shared/sendResponse";
 import status from "http-status";
 import { tokenUtils } from "../../utils/token";
 import AppError from "../../errorHelper/AppError";
+import { CookieUtils } from "../../utils/cookie";
 
 export const AuthController = {
   registerPatient: catchAsync(async (req: Request, res: Response) => {
@@ -83,6 +84,60 @@ export const AuthController = {
         refreshToken: newRefreshToken,
         sessionToken,
       },
+    });
+  }),
+
+  changePassword: catchAsync(async (req: Request, res: Response) => {
+    const payload = req.body;
+    const betterAuthSessionToken = req.cookies["better-auth.session_token"];
+
+    if (!betterAuthSessionToken) {
+      throw new AppError(status.UNAUTHORIZED, "Session token is missing");
+    }
+
+    const result = await AuthService.changePassword(
+      payload,
+      betterAuthSessionToken,
+    );
+
+    const { accessToken, refreshToken, sessionToken } = result;
+
+    tokenUtils.setAccessTokenCookie(res, accessToken);
+    tokenUtils.setRefreshTokenCookie(res, refreshToken);
+    tokenUtils.setBetterAuthSessionCookie(res, sessionToken);
+
+    sendResponse({
+      res,
+      statusCode: status.OK,
+      success: true,
+      message: "Password changed successfully",
+      data: result,
+    });
+  }),
+  logoutUser: catchAsync(async (req: Request, res: Response) => {
+    const betterAuthSessionToken = req.cookies["better-auth.session_token"];
+    const result = await AuthService.logoutUser(betterAuthSessionToken);
+    CookieUtils.clearCookie(res, "accessToken", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
+    CookieUtils.clearCookie(res, "refreshToken", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
+    CookieUtils.clearCookie(res, "better-auth.session_token", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
+    sendResponse({
+      res,
+      statusCode: status.OK,
+      success: true,
+      message: "User logged out successfully",
+      data: result,
     });
   }),
 };
