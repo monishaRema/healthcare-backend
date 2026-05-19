@@ -3,6 +3,7 @@ import cookieParser from "cookie-parser";
 import { router } from "./app/routes";
 import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
 import { notFound } from "./app/middleware/notFound";
+import { AdminRoutes } from "./app/modules/admin/admin.routes";
 
 const app: Application = express();
 
@@ -20,6 +21,7 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 app.use("/api/v1",router)
+app.use("/api/v1/admin", AdminRoutes)
 
 
 
