@@ -15,23 +15,23 @@ export const auth = betterAuth({
     requireEmailVerification: true,
   },
 
-  // socialProviders: {
-  //   google: {
-  //     clientId: env.GOOGLE_CLIENT_ID,
-  //     clientSecret: env.GOOGLE_CLIENT_SECRET,
-  //     // callbackUrl: envVars.GOOGLE_CALLBACK_URL,
-  //     mapProfileToUser: () => {
-  //       return {
-  //         role: UserRole.PATIENT,
-  //         status: UserStatus.ACTIVE,
-  //         needPasswordChange: false,
-  //         emailVerified: true,
-  //         isDeleted: false,
-  //         deletedAt: null,
-  //       };
-  //     },
-  //   },
-  // },
+  socialProviders: {
+    google: {
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
+      // callbackUrl: envVars.GOOGLE_CALLBACK_URL,
+      mapProfileToUser: () => {
+        return {
+          role: UserRole.PATIENT,
+          status: UserStatus.ACTIVE,
+          needPasswordChange: false,
+          emailVerified: true,
+          isDeleted: false,
+          deletedAt: null,
+        };
+      },
+    },
+  },
 
   emailVerification: {
     sendOnSignUp: true,

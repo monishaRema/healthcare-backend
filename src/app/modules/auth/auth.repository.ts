@@ -40,6 +40,14 @@ export const AuthRepository = {
     return prismaTx.patient.create({ data });
   },
 
+  getUserByEmail: async function (email: string) {
+    return prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+  },
+
   getMe: async function (userId: string) {
     return prisma.user.findUnique({
       where: {

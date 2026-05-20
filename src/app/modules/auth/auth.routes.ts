@@ -14,5 +14,6 @@ AuthRouter.post("/refresh-token", AuthController.getNewToken)
 AuthRouter.post("/change-password", checkAuth(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT, UserRole.SUPER_ADMIN), AuthController.changePassword)
 AuthRouter.post("/logout", checkAuth(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT, UserRole.SUPER_ADMIN), AuthController.logoutUser)
 AuthRouter.post("/verify-email", AuthController.verifyEmail)
-
+AuthRouter.post("/forgot-password", AuthController.forgotPassword)
+AuthRouter.post("/reset-password", AuthController.resetPassword)
 
