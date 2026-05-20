@@ -3,6 +3,7 @@ import { AuthController } from "./auth.controller";
 import { UserRole } from "../../../generated/prisma/enums";
 import { checkAuth } from "../../middleware/checkAuth";
 
+
 export const AuthRouter = Router();
 
 // /api/v1/auth
@@ -14,6 +15,10 @@ AuthRouter.post("/refresh-token", AuthController.getNewToken)
 AuthRouter.post("/change-password", checkAuth(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT, UserRole.SUPER_ADMIN), AuthController.changePassword)
 AuthRouter.post("/logout", checkAuth(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT, UserRole.SUPER_ADMIN), AuthController.logoutUser)
 AuthRouter.post("/verify-email", AuthController.verifyEmail)
-AuthRouter.post("/forgot-password", AuthController.forgotPassword)
+AuthRouter.post("/forgot-password", AuthController.forgetPassword)
 AuthRouter.post("/reset-password", AuthController.resetPassword)
+
+AuthRouter.get("/login/google", AuthController.googleLogin);
+AuthRouter.get("/google/success", AuthController.googleLoginSuccess);
+AuthRouter.get("/oauth/error", AuthController.handleOAuthError);
 

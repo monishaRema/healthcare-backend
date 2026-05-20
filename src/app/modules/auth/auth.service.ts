@@ -191,17 +191,9 @@ export const AuthService = {
 
     await AuthRepository.updatePassword(session.user.id);
 
-       if(session.user.needPasswordChange){
-        await prisma.user.update({
-            where: {
-                id: session.user.id,
-            },
-            data: {
-                needPasswordChange: false,
-            }
-        })
+    if (session.user.needPasswordChange) {
+      await AuthRepository.updateUserPasswordChangeFlag(session.user.id, false)
     }
-
 
     const accessToken = tokenUtils.getAccessToken({
       userId: session.user.id,
@@ -296,20 +288,48 @@ export const AuthService = {
     });
 
     if (isUserExist.needPasswordChange) {
-      await prisma.user.update({
-        where: {
-          id: isUserExist.id,
-        },
-        data: {
-          needPasswordChange: false,
-        },
-      });
+      await AuthRepository.updateUserPasswordChangeFlag(isUserExist.id, false);
     }
 
-    await prisma.session.deleteMany({
-      where: {
-        userId: isUserExist.id,
-      },
-    });
+    await AuthRepository.deleteUserSessions(isUserExist.id);
   },
+
+  googleLoginSuccess: async (session : Record<string, any>) =>{
+    const isPatientExists = await prisma.patient.findUnique({
+        where : {
+            userId : session.user.id,
+        }
+    })
+
+    if(!isPatientExists){
+        await prisma.patient.create({
+            data : {
+                userId : session.user.id,
+                name : session.user.name,
+                email : session.user.email,
+            }
+        
+        })
+    }
+
+    const accessToken = tokenUtils.getAccessToken({
+        userId: session.user.id,
+        role: session.user.role,
+        name: session.user.name,
+    });
+
+    const refreshToken = tokenUtils.getRefreshToken({
+        userId: session.user.id,
+        role: session.user.role,
+        name: session.user.name,
+    });
+
+    return {
+        accessToken,
+        refreshToken,
+    }
+}
 };
+
+
+

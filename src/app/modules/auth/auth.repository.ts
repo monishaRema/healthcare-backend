@@ -91,4 +91,26 @@ export const AuthRepository = {
       },
     });
   },
-};
+
+  updateUserPasswordChangeFlag: async(id:string, flag:boolean) => {
+      await prisma.user.update({
+        where: {
+          id: id ,
+        },
+        data: {
+          needPasswordChange: flag,
+        },
+      })
+  },
+
+  deleteUserSessions: async function (userId: string) {
+    await prisma.session.deleteMany({
+      where: {
+        userId: userId,
+      },
+    });
+  }
+
+}
+  
+
