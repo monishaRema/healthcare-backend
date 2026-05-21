@@ -179,6 +179,20 @@ export const AuthController = {
     });
   }),
 
+  // /api/v1/auth/login/google?redirect=/profile
+googleLogin: catchAsync((req: Request, res: Response) => {
+    const redirectPath = req.query.redirect || "/dashboard";
+
+    const encodedRedirectPath = encodeURIComponent(redirectPath as string);
+
+    const callbackURL = `${env.BETTER_AUTH_URL}/api/v1/auth/google/success?redirect=${encodedRedirectPath}`;
+
+    res.render("googleRedirect", {
+        callbackURL : callbackURL,
+        betterAuthUrl : env.BETTER_AUTH_URL,
+    })
+}),
+
   googleLoginSuccess: catchAsync(async (req: Request, res: Response) => {
     const redirectPath = (req.query.redirect as string) || "/dashboard";
 
