@@ -181,6 +181,7 @@ export const AuthController = {
 
   // /api/v1/auth/login/google?redirect=/profile
 googleLogin: catchAsync((req: Request, res: Response) => {
+
     const redirectPath = req.query.redirect || "/dashboard";
 
     const encodedRedirectPath = encodeURIComponent(redirectPath as string);
@@ -222,6 +223,7 @@ googleLogin: catchAsync((req: Request, res: Response) => {
 
     tokenUtils.setAccessTokenCookie(res, accessToken);
     tokenUtils.setRefreshTokenCookie(res, refreshToken);
+
     // ?redirect=//profile -> /profile
     const isValidRedirectPath =
       redirectPath.startsWith("/") && !redirectPath.startsWith("//");
@@ -231,6 +233,7 @@ googleLogin: catchAsync((req: Request, res: Response) => {
   }),
 
   handleOAuthError: catchAsync((req: Request, res: Response) => {
+    console.log("OAuth error:", req.query.error);
     const error = (req.query.error as string) || "oauth_failed";
     res.redirect(`${env.FRONTEND_URL}/login?error=${error}`);
   }),

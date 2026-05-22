@@ -1,4 +1,5 @@
 import type { Patient, Prisma } from "../../../generated/prisma/client";
+import { ISessionUser } from "../../interfaces/session.interface";
 import { prisma } from "../../lib/prisma";
 import type { IRegisterPatientPayload } from "./auth.types";
 
@@ -46,6 +47,25 @@ export const AuthRepository = {
         email,
       },
     });
+  },
+  getPatientByUserId: async function (id: string) {
+    return prisma.patient.findUnique({
+      where: {
+        userId:id,
+      },
+    });
+  },
+  createPatientFromGoogle:async function(session:ISessionUser) {
+
+     return await prisma.patient.create({
+                data : {
+                    userId : session.user.id,
+                    name : session.user.name,
+                    email : session.user.email,
+                    profilePhoto : session.user.image ?? null,
+                }
+            
+            })
   },
 
   getMe: async function (userId: string) {

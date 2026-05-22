@@ -14,6 +14,7 @@ import { IRequestUser } from "../../interfaces/reqUser.interface";
 import { jwtUtils } from "../../utils/jwt";
 import { env } from "../../config/env";
 import { JwtPayload } from "jsonwebtoken";
+import { ISessionUser } from "../../interfaces/session.interface";
 
 export const AuthService = {
   registerPatient: async function (payload: IRegisterUserPayload) {
@@ -294,22 +295,11 @@ export const AuthService = {
     await AuthRepository.deleteUserSessions(isUserExist.id);
   },
 
-  googleLoginSuccess: async (session : Record<string, any>) =>{
-    const isPatientExists = await prisma.patient.findUnique({
-        where : {
-            userId : session.user.id,
-        }
-    })
+  googleLoginSuccess: async (session : ISessionUser) =>{
+    const isPatientExists = await AuthRepository.getPatientByUserId(session.user.id);
 
     if(!isPatientExists){
-        await prisma.patient.create({
-            data : {
-                userId : session.user.id,
-                name : session.user.name,
-                email : session.user.email,
-            }
-        
-        })
+       await AuthRepository.createPatientFromGoogle(session);
     }
 
     const accessToken = tokenUtils.getAccessToken({
