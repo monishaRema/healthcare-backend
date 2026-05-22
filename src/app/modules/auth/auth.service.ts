@@ -177,6 +177,20 @@ export const AuthService = {
       throw new AppError(status.UNAUTHORIZED, "Invalid session token");
     }
 
+    const userAccount = await AuthRepository.getAccountDetailsByUserId(
+      session.user.id,
+    );
+
+    if (!userAccount) {
+      throw new AppError(status.NOT_FOUND, "User account not found");
+    }
+    if (userAccount.providerId === "google") {
+      throw new AppError(
+        status.BAD_REQUEST,
+        "Password change not allowed for Google accounts",
+      );
+    }
+
     const { currentPassword, newPassword } = payload;
 
     const result = await auth.api.changePassword({
@@ -193,7 +207,7 @@ export const AuthService = {
     await AuthRepository.updatePassword(session.user.id);
 
     if (session.user.needPasswordChange) {
-      await AuthRepository.updateUserPasswordChangeFlag(session.user.id, false)
+      await AuthRepository.updateUserPasswordChangeFlag(session.user.id, false);
     }
 
     const accessToken = tokenUtils.getAccessToken({
@@ -258,6 +272,18 @@ export const AuthService = {
       throw new AppError(status.NOT_FOUND, "User not found");
     }
 
+    const userAccount = await AuthRepository.getAccountDetailsByUserId(isUserExist.id);
+
+    if (!userAccount) {
+      throw new AppError(status.NOT_FOUND, "User account not found");
+    }
+    if (userAccount.providerId === "google") {
+      throw new AppError(
+        status.BAD_REQUEST,
+        "Password reset not allowed for Google accounts",
+      );
+    }
+
     await auth.api.requestPasswordResetEmailOTP({
       body: {
         email,
@@ -295,31 +321,30 @@ export const AuthService = {
     await AuthRepository.deleteUserSessions(isUserExist.id);
   },
 
-  googleLoginSuccess: async (session : ISessionUser) =>{
-    const isPatientExists = await AuthRepository.getPatientByUserId(session.user.id);
+  googleLoginSuccess: async (session: ISessionUser) => {
+    const isPatientExists = await AuthRepository.getPatientByUserId(
+      session.user.id,
+    );
 
-    if(!isPatientExists){
-       await AuthRepository.createPatientFromGoogle(session);
+    if (!isPatientExists) {
+      await AuthRepository.createPatientFromGoogle(session);
     }
 
     const accessToken = tokenUtils.getAccessToken({
-        userId: session.user.id,
-        role: session.user.role,
-        name: session.user.name,
+      userId: session.user.id,
+      role: session.user.role,
+      name: session.user.name,
     });
 
     const refreshToken = tokenUtils.getRefreshToken({
-        userId: session.user.id,
-        role: session.user.role,
-        name: session.user.name,
+      userId: session.user.id,
+      role: session.user.role,
+      name: session.user.name,
     });
 
     return {
-        accessToken,
-        refreshToken,
-    }
-}
+      accessToken,
+      refreshToken,
+    };
+  },
 };
-
-
-

@@ -51,21 +51,19 @@ export const AuthRepository = {
   getPatientByUserId: async function (id: string) {
     return prisma.patient.findUnique({
       where: {
-        userId:id,
+        userId: id,
       },
     });
   },
-  createPatientFromGoogle:async function(session:ISessionUser) {
-
-     return await prisma.patient.create({
-                data : {
-                    userId : session.user.id,
-                    name : session.user.name,
-                    email : session.user.email,
-                    profilePhoto : session.user.image ?? null,
-                }
-            
-            })
+  createPatientFromGoogle: async function (session: ISessionUser) {
+    return await prisma.patient.create({
+      data: {
+        userId: session.user.id,
+        name: session.user.name,
+        email: session.user.email,
+        profilePhoto: session.user.image ?? null,
+      },
+    });
   },
 
   getMe: async function (userId: string) {
@@ -112,15 +110,15 @@ export const AuthRepository = {
     });
   },
 
-  updateUserPasswordChangeFlag: async(id:string, flag:boolean) => {
-      await prisma.user.update({
-        where: {
-          id: id ,
-        },
-        data: {
-          needPasswordChange: flag,
-        },
-      })
+  updateUserPasswordChangeFlag: async (id: string, flag: boolean) => {
+    await prisma.user.update({
+      where: {
+        id: id,
+      },
+      data: {
+        needPasswordChange: flag,
+      },
+    });
   },
 
   deleteUserSessions: async function (userId: string) {
@@ -129,8 +127,18 @@ export const AuthRepository = {
         userId: userId,
       },
     });
-  }
-
-}
-  
-
+  },
+  getAccountDetailsByUserId: async function (userId: string) {
+    return await prisma.account.findFirst({
+      where: {
+        userId,
+      },
+      select: {
+        id: true,
+        accountId: true,
+        providerId: true,
+        userId: true,
+      },
+    });
+  },
+};
