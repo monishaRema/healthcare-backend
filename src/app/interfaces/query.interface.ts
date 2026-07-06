@@ -1,4 +1,3 @@
-
 export interface PrismaFindManyArgs {
     where ?: Record<string, unknown>;
     include ?: Record<string, unknown>;
@@ -10,6 +9,7 @@ export interface PrismaFindManyArgs {
     distinct ?: string[] | string;
     [key: string] : unknown;
 }
+
 export interface PrismaCountArgs {
     where?: Record<string, unknown>;
     include?: Record<string, unknown>;
@@ -22,10 +22,9 @@ export interface PrismaCountArgs {
     [key: string]: unknown;
 }
 
-
 export interface PrismaModelDelegate {
-    findMany(args ?: PrismaFindManyArgs) : Promise<any[]>;
-    count (args ?: PrismaCountArgs) : Promise<number>;
+    findMany(args ?: any) : Promise<any[]>;
+    count (args ?: any) : Promise<number>;
 }
 
 export interface IQueryParams {
@@ -42,4 +41,47 @@ export interface IQueryParams {
 export interface IQueryConfig {
     searchableFields?: string[];
     filterableFields?: string[];
+}
+
+export interface PrismaStringFilter{
+    contains ?: string;
+    startsWith ?: string;
+    endsWith ?: string;
+    mode ?: 'insensitive' | 'default';
+    equals ?: string;
+    in ?: string[];
+    notIn ?: string[];
+    lt ?: string;
+    lte ?: string;
+    gt ?: string;
+    gte ?: string;
+    not ?: PrismaStringFilter | string;
+}
+
+export interface PrismaNumberFilter{
+    equals ?: number;
+    in ?: number[];
+    notIn ?: number[];
+    lt ?: number;
+    lte ?: number;
+    gt ?: number;
+    gte ?: number;
+    not ?: PrismaNumberFilter | number;
+}
+
+export interface PrismaWhereConditions {
+    OR ?: Record<string, unknown>[];
+    AND ?: Record<string, unknown>[];
+    NOT ?: Record<string, unknown>[];
+    [key: string] : unknown;
+}
+
+export interface IQueryResult<T>{
+    data : T[];
+    meta : {
+        page : number;
+        limit : number;
+        total : number;
+        totalPages : number;
+    }
 }
