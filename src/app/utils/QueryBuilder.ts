@@ -273,7 +273,14 @@ TInclude = Record<string, unknown>
         }
         return this;
     }
-
+    /**
+     * select{
+     * id:{
+     *  name: true
+     * }
+     * 
+     * }
+     */
     fields() : this {
         const fieldsParam = this.queryParams.fields;
         // /doctors?fields=id,name,user => select: { id: true, name: true, user: { select: { name: true } } }
