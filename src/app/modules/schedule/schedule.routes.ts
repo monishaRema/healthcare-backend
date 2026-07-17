@@ -5,6 +5,7 @@ import { ScheduleController } from "./schedule.controller";
 import { validateRequest } from "../../middleware/validateRequest";
 import { ScheduleValidation } from "./schedule.validation";
 
+
 const router = Router();
 
 router.post('/', checkAuth(UserRole.ADMIN, UserRole.SUPER_ADMIN), validateRequest(ScheduleValidation.createScheduleZodSchema) , ScheduleController.createSchedule);
