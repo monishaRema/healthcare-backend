@@ -9,10 +9,19 @@ import { toNodeHandler } from "better-auth/node";
 import { auth } from "./app/lib/auth";
 import path from "path";
 import { env } from "./app/config/env";
+import { PaymentController } from "./app/modules/payment/payment.controller";
 
 const app: Application = express();
 app.set("view engine", "ejs");
 app.set("views", path.resolve(process.cwd(), `src/app/templates`));
+
+// Stripe requires the raw request body to verify webhook signatures, so this
+// must be registered before express.json() below.
+app.post(
+  "/webhook",
+  express.raw({ type: "application/json" }),
+  PaymentController.handleStripeWebhookEvent,
+);
 
 app.use(
   cors({

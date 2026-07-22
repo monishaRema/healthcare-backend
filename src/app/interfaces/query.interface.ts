@@ -81,7 +81,7 @@ export interface IQueryResult<T>{
     meta : {
         page : number;
         limit : number;
-        total : number;
+        totalItems : number;
         totalPages : number;
     }
 }

@@ -370,7 +370,7 @@ TInclude = Record<string, unknown>
             meta : {
                 page : this.page,
                 limit : this.limit,
-                total,
+                totalItems : total,
                 totalPages,
             }
         }

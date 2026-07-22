@@ -1,8 +1,9 @@
 import { Router } from "express";
 
 import { checkAuth } from "../../middleware/checkAuth";
-import { DoctorScheduleController } from "./doctorSchedule.controller";
+
 import { UserRole } from "../../../generated/prisma/enums";
+import { DoctorScheduleController } from "./docotorSchedule.controller";
 
 export const doctorScheduleRoutes = Router();
 

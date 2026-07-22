@@ -13,7 +13,8 @@
     "generate": "prisma generate",
     "studio": "prisma studio",
     "push": "prisma db push",
-    "pull": "prisma db pull"
+    "pull": "prisma db pull",
+    "stripe:webhook": "stripe listen --forward-to localhost:5000/webhook"
   },
   "keywords": [],
   "author": "Monisha Rema",
@@ -38,7 +39,9 @@
     "multer": "^2.1.1",
     "multer-storage-cloudinary": "^4.0.0",
     "nodemailer": "^8.0.7",
+    "pdfkit": "^0.19.1",
     "pg": "^8.18.0",
+    "stripe": "^22.3.2",
     "zod": "^4.4.3"
   },
   "devDependencies": {
@@ -51,6 +54,7 @@
     "@types/multer": "^2.1.0",
     "@types/node": "^25.2.0",
     "@types/nodemailer": "^8.0.0",
+    "@types/pdfkit": "^0.17.6",
     "@types/pg": "^8.16.0",
     "eslint": "^9.39.2",
     "prisma": "^7.3.0",

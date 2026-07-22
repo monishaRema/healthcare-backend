@@ -5,9 +5,9 @@ import { userRouter } from "../modules/user/user.routes";
 import { doctorRouter } from "../modules/doctor/doctor.routes";
 import { AdminRoutes } from "../modules/admin/admin.routes";
 import { scheduleRoutes } from "../modules/schedule/schedule.routes";
-import { doctorScheduleRouter, doctorScheduleRoutes } from "../modules/docotorSchedule/docotorSchedule.routes";
-import { doctorScheduleRouter } from "../modules/docotorSchedule/docotorSchedule.routes";
+import { doctorScheduleRoutes } from "../modules/docotorSchedule/docotorSchedule.routes";
 import { appointmentRoutes } from "../modules/appoinment/appointment.routes";
+import { paymentRoutes } from "../modules/payment/payment.routes";
 
 export const router = Router();
 
@@ -37,6 +37,9 @@ router.use("/doctor-schedules", doctorScheduleRoutes)
 
 // /api/v1/appointments
 router.use("/appointments", appointmentRoutes)
+
+// /api/v1/payments
+router.use("/payments", paymentRoutes)
 
 
 

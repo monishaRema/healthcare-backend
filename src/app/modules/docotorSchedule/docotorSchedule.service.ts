@@ -62,9 +62,56 @@ export const doctorScheduleService = {
     return doctorSchedules;
   },
 
-  getAllDoctorSchedules: async (query: IQueryParams) => {},
+  getAllDoctorSchedules: async (query: IQueryParams) => {
+    const queryBuilder = new QueryBuilder<DoctorSchedules, Prisma.DoctorSchedulesWhereInput, Prisma.DoctorSchedulesInclude>(
+      prisma.doctorSchedules,
+      query,
+      {
+        filterableFields: doctorScheduleSearchableFields,
+        searchableFields: doctorScheduleSearchableFields,
+      },
+    );
 
-  getDoctorScheduleById: async (doctorId: string, scheduleId: string) => {},
+    const doctorSchedules = await queryBuilder
+      .search()
+      .filter()
+      .paginate()
+      .include({
+        schedule: true,
+        doctor: {
+          include: {
+            user: true,
+          },
+        },
+      })
+      .sort()
+      .fields()
+      .dynamicInclude(doctorScheduleIncludeConfig)
+      .execute();
+
+    return doctorSchedules;
+  },
+
+  getDoctorScheduleById: async (doctorId: string, scheduleId: string) => {
+    const doctorSchedule = await prisma.doctorSchedules.findUniqueOrThrow({
+      where: {
+        doctorId_scheduleId: {
+          doctorId,
+          scheduleId,
+        },
+      },
+      include: {
+        schedule: true,
+        doctor: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+
+    return doctorSchedule;
+  },
 
   updateMyDoctorSchedule: async (user: IRequestUser, payload: IUpdateDoctorSchedulePayload) => {
      const doctorData = await prisma.doctor.findUniqueOrThrow({
